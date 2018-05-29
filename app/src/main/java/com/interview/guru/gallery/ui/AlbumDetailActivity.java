@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.interview.guru.gallery.Constants;
+import com.interview.guru.gallery.helpers.RetrofitHelper;
 import com.interview.guru.gallery.interfaces.OnItemClickListener;
 import com.interview.guru.gallery.R;
 import com.interview.guru.gallery.interfaces.RequestsClient;
@@ -97,14 +98,9 @@ public class AlbumDetailActivity extends AppCompatActivity  implements OnItemCli
     void mGetAlbumData(String pathID)
     {
 
-        Retrofit retrofit =
-                new Retrofit.Builder()
-                        .baseUrl(Constants.BASE_URL)
-                        .addConverterFactory(
-                                GsonConverterFactory.create()
-                        ).build();
+        RetrofitHelper retrofitHelper = new RetrofitHelper(Constants.BASE_URL);
 
-        RequestsClient requestsClient = retrofit.create(RequestsClient.class);
+        RequestsClient requestsClient = retrofitHelper.getRetrofit().create(RequestsClient.class);
 
         Call<List<AlbumData>> call  = requestsClient.getAlbumDataByID(pathID);
 
@@ -132,6 +128,8 @@ public class AlbumDetailActivity extends AppCompatActivity  implements OnItemCli
 
     @Override
     public void onClick(View View, int Position) {
+
+
 
     }
 }
