@@ -5,7 +5,8 @@ import android.util.Log;
 import com.interview.guru.gallery.Constants;
 import com.interview.guru.gallery.helpers.RetrofitHelper;
 import com.interview.guru.gallery.interfaces.RequestsClient;
-import com.interview.guru.gallery.pojo.Album;
+import com.interview.guru.gallery.pojo.AlbumData;
+import com.interview.guru.gallery.view.AlbumActivityContract;
 import com.interview.guru.gallery.view.MainActivityContract;
 
 import java.util.ArrayList;
@@ -15,31 +16,33 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivityModel implements MainActivityContract.Model {
+public class AlbumActivityModel implements AlbumActivityContract.Model {
 
 
     RetrofitHelper retrofitHelper;
-    List<Album> mAlbumDataList = new ArrayList<>();
+    List<AlbumData> mAlbumDataList = new ArrayList<>();
+    String ID;
 
-    MainActivityContract.onNetworkOperation networkOperation;
+    AlbumActivityContract.onNetworkOperation networkOperation;
 
-    public MainActivityModel(MainActivityContract.onNetworkOperation onNetworkOperation) {
+    public AlbumActivityModel(AlbumActivityContract.onNetworkOperation onNetworkOperation,String id) {
+        ID = id;
 
         this.networkOperation = onNetworkOperation;
     }
 
 
-    public List<Album> mGetAlbumData() {
+    public List<AlbumData> mGetAlbumData() {
 
         retrofitHelper = new RetrofitHelper(Constants.BASE_URL);
 
         RequestsClient requestsClient = retrofitHelper.getRetrofit().create(RequestsClient.class);
 
-        Call<List<Album>> call = requestsClient.getAlbumData();
+        Call<List<AlbumData>> call = requestsClient.getAlbumDataByID(ID);
 
-        call.enqueue(new Callback<List<Album>>() {
+        call.enqueue(new Callback<List<AlbumData>>() {
             @Override
-            public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
+            public void onResponse(Call<List<AlbumData>> call, Response<List<AlbumData>> response) {
 
                 mAlbumDataList.clear();
                 mAlbumDataList.addAll(response.body());
@@ -50,9 +53,9 @@ public class MainActivityModel implements MainActivityContract.Model {
             }
 
             @Override
-            public void onFailure(Call<List<Album>> call, Throwable t) {
+            public void onFailure(Call<List<AlbumData>> call, Throwable t) {
 
-                Log.d("MainActivity", "network call Failed");
+                Log.d("albumActivity", "network call Failed");
 
             }
         });

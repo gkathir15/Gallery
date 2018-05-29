@@ -17,7 +17,13 @@ import com.interview.guru.gallery.interfaces.OnItemClickListener;
 import com.interview.guru.gallery.R;
 import com.interview.guru.gallery.interfaces.RequestsClient;
 import com.interview.guru.gallery.adapter.AlbumDataRecyclerAdapter;
+import com.interview.guru.gallery.model.AlbumActivityModel;
+import com.interview.guru.gallery.model.MainActivityModel;
 import com.interview.guru.gallery.pojo.AlbumData;
+import com.interview.guru.gallery.presenter.AlbumActivityPresenter;
+import com.interview.guru.gallery.presenter.MainActivityPresenter;
+import com.interview.guru.gallery.view.AlbumActivityContract;
+import com.interview.guru.gallery.view.MainActivityContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AlbumDetailActivity extends AppCompatActivity  implements OnItemClickListener {
+public class AlbumDetailActivity extends AppCompatActivity  implements OnItemClickListener,AlbumActivityContract.View ,AlbumActivityContract.onNetworkOperation {
 
 
     RecyclerView mImagesRecyclerView;
@@ -36,6 +42,8 @@ public class AlbumDetailActivity extends AppCompatActivity  implements OnItemCli
     AlbumDataRecyclerAdapter mAlbumDataRecyclerAdapter;
 
     List<AlbumData> mAlbumDataList  = new ArrayList<>();
+    AlbumActivityContract.Presenter presenter;
+    AlbumActivityModel albumActivityModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +58,11 @@ public class AlbumDetailActivity extends AppCompatActivity  implements OnItemCli
         mImagesRecyclerView.setAdapter(mAlbumDataRecyclerAdapter);
         mAlbumDataRecyclerAdapter.setClickListener(this);
 
+        albumActivityModel = new AlbumActivityModel(this,String.valueOf(mRecievedID));
+        presenter = new AlbumActivityPresenter(this,albumActivityModel);
 
-        mGetAlbumData(String.valueOf(mRecievedID));
+
+       // mGetAlbumData(String.valueOf(mRecievedID));
 
 
 
@@ -95,41 +106,59 @@ public class AlbumDetailActivity extends AppCompatActivity  implements OnItemCli
         });
     }
 
-    void mGetAlbumData(String pathID)
-    {
-
-        RetrofitHelper retrofitHelper = new RetrofitHelper(Constants.BASE_URL);
-
-        RequestsClient requestsClient = retrofitHelper.getRetrofit().create(RequestsClient.class);
-
-        Call<List<AlbumData>> call  = requestsClient.getAlbumDataByID(pathID);
-
-        call.enqueue(new Callback<List<AlbumData>>() {
-            @Override
-            public void onResponse(Call<List<AlbumData>> call, Response<List<AlbumData>> response) {
-
-                mAlbumDataList.clear();
-                mAlbumDataList.addAll(response.body());
-                Log.d("size", String.valueOf(response.body().size()));
-                mAlbumDataRecyclerAdapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onFailure(Call<List<AlbumData>> call, Throwable t) {
-
-                Log.d("MainActivity","network call Failed");
-
-            }
-        });
-
-
-    }
+//    void mGetAlbumData(String pathID)
+//    {
+//
+//        RetrofitHelper retrofitHelper = new RetrofitHelper(Constants.BASE_URL);
+//
+//        RequestsClient requestsClient = retrofitHelper.getRetrofit().create(RequestsClient.class);
+//
+//        Call<List<AlbumData>> call  = requestsClient.getAlbumDataByID(pathID);
+//
+//        call.enqueue(new Callback<List<AlbumData>>() {
+//            @Override
+//            public void onResponse(Call<List<AlbumData>> call, Response<List<AlbumData>> response) {
+//
+//                mAlbumDataList.clear();
+//                mAlbumDataList.addAll(response.body());
+//                Log.d("size", String.valueOf(response.body().size()));
+//                mAlbumDataRecyclerAdapter.notifyDataSetChanged();
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<AlbumData>> call, Throwable t) {
+//
+//                Log.d("MainActivity","network call Failed");
+//
+//            }
+//        });
+//
+//
+//    }
 
     @Override
     public void onClick(View View, int Position) {
 
 
+
+    }
+
+    @Override
+    public void initView(List<AlbumData> albums) {
+
+
+
+    }
+
+    @Override
+    public void onResponseComplete(List<AlbumData> mAlbumDataList) {
+
+        this.mAlbumDataList.addAll(mAlbumDataList);
+
+
+
+        mAlbumDataRecyclerAdapter.notifyDataSetChanged();
 
     }
 }
